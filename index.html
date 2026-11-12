@@ -40,6 +40,16 @@ h1{margin:6px 0 2px;font-size:28px;color:var(--red);letter-spacing:.5px}
 .win.show{display:block}
 .win h2{margin:0 0 6px;color:var(--red)}
 .foot{font-size:12px;color:var(--mut);margin-top:18px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:24px;z-index:99;cursor:pointer}
+.ov.show{display:flex;animation:fd .2s}
+.pop{background:var(--card);border:2px solid var(--gold);border-radius:22px;padding:24px 20px;max-width:360px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.pop.bad{border-color:var(--red)}
+.pi{font-size:64px;display:inline-block}
+.pt{font-size:17px;line-height:1.5;margin:10px 0}
+.ph{font-size:12px;color:var(--mut)}
+@keyframes pp{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes sp{from{transform:rotate(-360deg) scale(.3)}to{transform:rotate(0) scale(1)}}
+@keyframes fd{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
@@ -80,6 +90,8 @@ h1{margin:6px 0 2px;font-size:28px;color:var(--red);letter-spacing:.5px}
   <button class="btn alt" id="reset">Làm lại từ đầu</button>
   <p class="foot">Trang mang tính giải trí. Cầu nguyện chỉ hỗ trợ tinh thần, KPI vẫn cần làm việc nhé 😄</p>
 </main>
+
+<div class="ov" id="ov"><div class="pop" id="pop"><div class="pi" id="pi"></div><div class="pt" id="pt"></div><div class="ph">Chạm vào màn hình để đóng</div></div></div>
 
 <script>
 const KPIS=[
@@ -146,6 +158,17 @@ $("burn").onclick=e=>{
 };
 $("xam").onclick=()=>{$("quote").textContent="🎋 "+XAM[Math.floor(Math.random()*XAM.length)]};
 $("reset").onclick=()=>{S={k:S.k,pct:0,merit:0,inc:0};$("quote").textContent="Thắp hương rồi xin xăm xem vận KPI hôm nay.";render();save()};
+const ov=$("ov");
+function popup(t){
+ const i=t.indexOf(" "),p=$("pop"),c=$("pi");
+ c.textContent=t.slice(0,i);$("pt").textContent=t.slice(i+1);
+ p.classList.toggle("bad",t.startsWith("💨"));
+ p.style.animation="none";c.style.animation="none";void p.offsetWidth;
+ p.style.animation="pp .45s cubic-bezier(.2,1.4,.4,1)";c.style.animation="sp .7s ease-out";
+ ov.classList.add("show");
+}
+new MutationObserver(()=>{const t=$("quote").textContent;if(t&&!t.startsWith("Thắp hương rồi"))popup(t)}).observe($("quote"),{childList:true,characterData:true,subtree:true});
+ov.onclick=()=>ov.classList.remove("show");
 render();
 </script>
 </body>
