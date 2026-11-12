@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Miếu Thờ KPI</title>
+<style>
+:root{--bg:#fff7e6;--card:#fffdf6;--ink:#4a1c10;--mut:#8a5a44;--red:#b3261e;--gold:#c8901a;--line:#ecd9a8;--bar:#e9dcc0;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d0f0b;--card:#2a1712;--ink:#fbe9c8;--mut:#c9a27f;--red:#ff6b5e;--gold:#f2b84b;--line:#4a2d22;--bar:#3b241b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1d0f0b;--card:#2a1712;--ink:#fbe9c8;--mut:#c9a27f;--red:#ff6b5e;--gold:#f2b84b;--line:#4a2d22;--bar:#3b241b;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;display:flex;justify-content:center}
+main{width:100%;max-width:520px;padding:20px 16px 40px;text-align:center}
+h1{margin:6px 0 2px;font-size:28px;color:var(--red);letter-spacing:.5px}
+.sub{color:var(--mut);margin:0 0 16px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);padding:8px 12px;border-radius:999px;font-size:14px;cursor:pointer}
+.chip.on{background:var(--red);color:#fff;border-color:var(--red)}
+.label{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;color:var(--mut)}
+.label b{color:var(--ink);font-size:18px}
+.bar{height:22px;background:var(--bar);border-radius:999px;overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--red));transition:width .35s}
+.status{margin-top:10px;font-size:15px;min-height:22px}
+.fish{position:relative;font-size:88px;line-height:1;background:none;border:0;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;padding:6px 14px;transition:transform .08s}
+.fish:active,.fish.hit{transform:scale(.88) rotate(-6deg)}
+.hint{color:var(--mut);font-size:13px;margin:2px 0 0}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{background:var(--red);color:#fff;border:0;border-radius:12px;padding:11px 16px;font-size:15px;cursor:pointer}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.incense{font-size:34px;letter-spacing:6px;min-height:46px}
+.smoke{animation:fl 2.4s infinite ease-in-out;display:inline-block}
+@keyframes fl{0%,100%{transform:translateY(0);opacity:1}50%{transform:translateY(-4px);opacity:.7}}
+.quote{font-size:16px;line-height:1.5;min-height:48px}
+.float{position:fixed;pointer-events:none;color:var(--gold);font-weight:700;animation:up 1s forwards;z-index:9}
+@keyframes up{to{transform:translateY(-70px);opacity:0}}
+.win{display:none;border-color:var(--gold);background:linear-gradient(135deg,var(--card),var(--bar))}
+.win.show{display:block}
+.win h2{margin:0 0 6px;color:var(--red)}
+.foot{font-size:12px;color:var(--mut);margin-top:18px}
+</style>
+</head>
+<body>
+<main>
+  <div style="font-size:44px">🏮 ⛩️ 🏮</div>
+  <h1>Miếu Thờ KPI</h1>
+  <p class="sub">Cầu cho deadline lùi, doanh số tiến, sếp vui vẻ</p>
+
+  <div class="card">
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span id="kname">KPI Doanh số</span><b id="pct">0%</b></div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="status" id="status">Chưa đạt. Hãy gõ mõ để tích công đức.</div>
+  </div>
+
+  <div class="card win" id="win">
+    <h2>🎉 KPI ĐÃ ĐẠT 100%!</h2>
+    <div>Thánh KPI hài lòng. Nhớ về làm thật nữa nhé!</div>
+  </div>
+
+  <div class="card">
+    <button class="fish" id="fish" aria-label="Gõ mõ">🪘</button>
+    <p class="hint">Gõ mõ: mỗi cú +công đức (<span id="merit">0</span> công đức)</p>
+  </div>
+
+  <div class="card">
+    <div class="incense" id="inc">—</div>
+    <div class="row">
+      <button class="btn" id="burn">🪔 Thắp hương (+5%, 30% Tổ không chứng)</button>
+      <button class="btn alt" id="xam">🎋 Xin xăm</button>
+    </div>
+    <p class="quote" id="quote">Thắp hương rồi xin xăm xem vận KPI hôm nay.</p>
+  </div>
+
+  <button class="btn alt" id="reset">Làm lại từ đầu</button>
+  <p class="foot">Trang mang tính giải trí. Cầu nguyện chỉ hỗ trợ tinh thần, KPI vẫn cần làm việc nhé 😄</p>
+</main>
+
+<script>
+const KPIS=[
+ {n:"Doanh số",e:"💰",p:"Con xin khách ký hợp đồng thật nhanh, thanh toán thật đúng hạn."},
+ {n:"Deadline",e:"⏰",p:"Con xin task ít bug, review mượt, không ai đổi yêu cầu phút chót."},
+ {n:"OKR",e:"🎯",p:"Con xin Key Result tự nhích lên, Objective khỏi phải viết lại."},
+ {n:"Tăng trưởng",e:"📈",p:"Con xin biểu đồ đi lên, retention cao, churn đi chỗ khác."},
+ {n:"Tăng ca ít",e:"🌙",p:"Con xin họp ngắn lại, về đúng giờ mà vẫn đạt chỉ tiêu."}
+];
+const XAM=[
+ "Quẻ thượng thượng: sếp duyệt ngay lần đầu, không comment.",
+ "Quẻ thượng: khách hàng tự gọi lại để chốt đơn.",
+ "Quẻ trung bình: đạt KPI nếu bạn chịu bấm gửi email đó.",
+ "Quẻ khuyên: bớt lướt điện thoại, KPI tự khắc đẹp.",
+ "Quẻ hung hóa cát: báo cáo lỗi nhưng sếp quên không mở.",
+ "Quẻ đặc biệt: hôm nay server không sập, mọi việc thuận lợi.",
+ "Quẻ vui: đồng nghiệp bao trà sữa, năng lượng tăng 20%.",
+ "Quẻ nhắc nhở: lương về rồi thì KPI cũng sắp về."
+];
+let S={k:0,pct:0,merit:0,inc:0};
+try{const r=localStorage.getItem("kpi-temple");if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const $=id=>document.getElementById(id);
+function save(){try{localStorage.setItem("kpi-temple",JSON.stringify(S))}catch(e){}}
+function msg(p){
+ if(p>=100)return "KPI hoàn thành. Thánh đã chứng giám!";
+ if(p>=75)return "Sắp về đích rồi, cố thêm chút nữa!";
+ if(p>=50)return "Qua nửa chặng. Thần tài đang để ý bạn.";
+ if(p>=25)return "Đã có tiến triển. Tiếp tục gõ mõ nào.";
+ return "Chưa đạt. Hãy gõ mõ để tích công đức.";
+}
+function render(){
+ $("chips").innerHTML=KPIS.map((k,i)=>`<button class="chip ${i===S.k?"on":""}" data-i="${i}">${k.e} ${k.n}</button>`).join("");
+ $("kname").textContent="KPI "+KPIS[S.k].n;
+ $("pct").textContent=Math.floor(S.pct)+"%";
+ $("fill").style.width=S.pct+"%";
+ $("status").textContent=msg(S.pct);
+ $("merit").textContent=S.merit;
+ $("inc").innerHTML=S.inc?Array.from({length:Math.min(S.inc,7)},(_,i)=>`<span class="smoke" style="animation-delay:${i*.25}s">🕯️</span>`).join(""):"—";
+ $("win").classList.toggle("show",S.pct>=100);
+}
+function add(n,x,y){
+ const was=S.pct;S.pct=Math.max(0,Math.min(100,S.pct+n));render();save();
+ if(x!=null){const f=document.createElement("div");f.className="float";f.textContent=(n>0?"+":"")+n.toFixed(0===n%1?0:1)+"%";if(n<0)f.style.color="var(--red)";f.style.left=x+"px";f.style.top=y+"px";document.body.appendChild(f);setTimeout(()=>f.remove(),1000)}
+ if(was<100&&S.pct>=100)$("win").scrollIntoView({behavior:"smooth",block:"center"});
+}
+$("chips").onclick=e=>{const b=e.target.closest(".chip");if(!b)return;S.k=+b.dataset.i;$("quote").textContent="🙏 "+KPIS[S.k].p;render();save()};
+$("fish").onclick=e=>{
+ const b=e.currentTarget;b.classList.add("hit");setTimeout(()=>b.classList.remove("hit"),90);
+ S.merit++;const r=e.clientX?e:{clientX:innerWidth/2,clientY:innerHeight/2};
+ add(+(Math.random()*1.5+.5).toFixed(1),r.clientX,r.clientY-20);
+};
+$("burn").onclick=e=>{
+ if(Math.random()<0.3){
+  const loss=-(Math.floor(Math.random()*11)+5);
+  S.inc=Math.max(S.inc-1,0);
+  const WHY=["Thắp hương mà tay vẫn cầm điện thoại lướt Facebook.","Đi cầu KPI mà quên mang theo lễ, chỉ có mỗi cái miệng.","Tổ nghe nói bạn còn nợ báo cáo tuần trước chưa nộp.","Hôm qua bạn trả lời email của sếp bằng một chữ Ok.","Bạn khấn hơi nhỏ, Tổ đang họp nên không nghe thấy.","Tổ phát hiện bạn chưa cập nhật tiến độ lên Jira/Trello.","Bạn vừa thắp hương vừa nghĩ đến trà sữa, lòng không thành.","Cắm hương ngược chiều, Tổ xoay đầu không thấy.","Bạn khấn đạt KPI mà chưa hề mở file Excel lần nào.","Tổ đang bận chứng cho team khác, đợi xếp hàng nhé.","Bạn cầu cho sếp nghỉ phép, Tổ thấy không đẹp lắm.","Bạn hẹn họp 5 phút nhưng kéo dài 2 tiếng, nghiệp quật.","Ví tiền mỏng mà đòi cầu doanh số cao, Tổ cũng khó xử.","Bạn nói để mai làm, nhưng mai nào cũng là mai.","Hương giả, chất lượng thấp, Tổ ngửi không ra mùi thành tâm.","Bạn đi trễ 15 phút, Tổ tính lãi suất luôn."];
+  const why=WHY[Math.floor(Math.random()*WHY.length)];
+  $("quote").textContent="💨 Tổ không chứng! "+why+" Bị trừ "+(-loss)+"% KPI.";
+  add(loss,e.clientX,e.clientY-20);
+ }else{
+  S.inc=Math.min(S.inc+1,7);S.merit+=5;add(5,e.clientX,e.clientY-20);
+  $("quote").textContent="🙏 Tổ đã chứng! "+KPIS[S.k].p;
+ }
+};
+$("xam").onclick=()=>{$("quote").textContent="🎋 "+XAM[Math.floor(Math.random()*XAM.length)]};
+$("reset").onclick=()=>{S={k:S.k,pct:0,merit:0,inc:0};$("quote").textContent="Thắp hương rồi xin xăm xem vận KPI hôm nay.";render();save()};
+render();
+</script>
+</body>
+</html>
